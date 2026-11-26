@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Para Ti • Una Noche Especial ✨</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- Google Fonts: Cinzel, Great Vibes & Montserrat -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --gold-light: #fff3b0;
+      --gold-mid: #ffd700;
+      --gold-dark: #b8860b;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: radial-gradient(ellipse at top, #1f1b33 0%, #0d0b18 55%, #040308 100%);
+      min-height: 100vh;
+      color: #f6e8b1;
+      overflow-x: hidden;
+      user-select: none;
+    }
+
+    .font-royal { font-family: 'Cinzel', serif; }
+    .font-script { font-family: 'Great Vibes', cursive; }
+
+    /* Ambient Aurora Glow */
+    .ambient-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.35;
+      animation: orbFloat 10s ease-in-out infinite alternate;
+    }
+
+    @keyframes orbFloat {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(25px, -30px) scale(1.15); }
+    }
+
+    /* Luxury Metallic Gold Text */
+    .gold-foil {
+      background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 25%, #ffd700 50%, #fbf5b7 75%, #aa771c 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shineFoil 5s linear infinite;
+    }
+
+    @keyframes shineFoil {
+      to { background-position: 200% center; }
+    }
+
+    /* Glassmorphism Luxury Card */
+    .luxury-glass {
+      background: linear-gradient(165deg, rgba(24, 21, 38, 0.78) 0%, rgba(10, 8, 18, 0.92) 100%);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 215, 0, 0.28);
+      box-shadow: 
+        0 25px 60px -15px rgba(0, 0, 0, 0.9),
+        0 0 40px rgba(255, 215, 0, 0.08),
+        inset 0 1px 1px rgba(255, 243, 176, 0.25);
+    }
+
+    /* Corner Ornaments */
+    .corner-ornament {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      border-color: rgba(255, 215, 0, 0.45);
+      pointer-events: none;
+    }
+
+    /* Candle Flame & Halo */
+    .flame {
+      transform-origin: center bottom;
+      opacity: 0;
+      transform: scale(0);
+      transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .flame.lit {
+      opacity: 1;
+      transform: scale(1);
+      animation: flicker 1.1s ease-in-out infinite alternate;
+    }
+
+    @keyframes flicker {
+      0% { transform: scale(1) rotate(-1.5deg); filter: drop-shadow(0 0 10px #ffae00); }
+      33% { transform: scale(1.09) rotate(1.5deg); filter: drop-shadow(0 0 18px #ff7700); }
+      66% { transform: scale(0.95) rotate(-1deg); filter: drop-shadow(0 0 12px #ffde59); }
+      100% { transform: scale(1.04) rotate(1.5deg); filter: drop-shadow(0 0 16px #ff914d); }
+    }
+
+    /* Warm Light Aura over Cake when candles are lit */
+    .cake-halo {
+      position: absolute;
+      width: 220px;
+      height: 140px;
+      background: radial-gradient(circle, rgba(255, 190, 60, 0.28) 0%, transparent 70%);
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 1.2s ease;
+      pointer-events: none;
+    }
+    .cake-halo.active { opacity: 1; }
+
+    /* Realistic Smoke */
+    .smoke-particle {
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      background: rgba(235, 235, 245, 0.75);
+      border-radius: 50%;
+      filter: blur(2px);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .smoke-particle.active {
+      animation: riseSmoke 2.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes riseSmoke {
+      0% { opacity: 0.85; transform: translate(-50%, 0) scale(1); }
+      50% { opacity: 0.45; transform: translate(-75%, -28px) scale(2.8); }
+      100% { opacity: 0; transform: translate(-25%, -70px) scale(5); }
+    }
+
+    /* Gold Dust Particles */
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff9d6 0%, #ffd700 70%, transparent 100%);
+      animation: floatDust linear infinite alternate;
+    }
+
+    @keyframes floatDust {
+      from { opacity: 0.15; transform: translateY(0px) scale(0.7); }
+      to { opacity: 0.95; transform: translateY(-14px) scale(1.3); }
+    }
+
+    /* Step Transitions */
+    .step-card {
+      transition: opacity 0.65s ease, transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .step-hidden {
+      opacity: 0;
+      transform: translateY(18px) scale(0.97);
+      pointer-events: none;
+      position: absolute;
+      width: 100%;
+    }
+    .step-active {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      position: relative;
+    }
+
+    /* Premium Button */
+    .btn-luxury {
+      background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+      background-size: 250% 250%;
+      animation: goldShift 4s ease infinite;
+      box-shadow: 0 10px 25px -5px rgba(212, 175, 55, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+    }
+    .btn-luxury:hover {
+      box-shadow: 0 14px 32px -4px rgba(255, 215, 0, 0.65), inset 0 1px 1px rgba(255, 255, 255, 0.9);
+    }
+
+    @keyframes goldShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Polaroid Frame */
+    .polaroid-card {
+      background: linear-gradient(145deg, #1f1b2e, #120f1c);
+      border: 1px solid rgba(255, 215, 0, 0.4);
+      padding: 10px 10px 26px 10px;
+      border-radius: 14px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.7), 0 0 20px rgba(255,215,0,0.15);
+      transform: rotate(-2.5deg);
+      transition: transform 0.4s ease;
+    }
+    .polaroid-card:hover {
+      transform: rotate(0deg) scale(1.03);
+    }
+
+    .snoopy-float {
+      animation: snoopyFloat 3.2s ease-in-out infinite alternate;
+    }
+    @keyframes snoopyFloat {
+      from { transform: translateY(0) rotate(-3deg); }
+      to { transform: translateY(-8px) rotate(3deg); }
+    }
+
+    /* Modal Letter */
+    .letter-paper {
+      background: linear-gradient(180deg, #1b1729 0%, #100d1a 100%);
+      border: 1px solid rgba(255, 215, 0, 0.35);
+      box-shadow: 0 25px 70px rgba(0,0,0,0.95), 0 0 40px rgba(255, 215, 0, 0.15);
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center p-4 min-h-screen relative">
+
+  <!-- Ambient Lights & Gold Dust -->
+  <div class="ambient-orb w-80 h-80 bg-amber-500/20 -top-10 -left-10"></div>
+  <div class="ambient-orb w-96 h-96 bg-purple-600/20 bottom-0 right-0" style="animation-delay: -4s;"></div>
+  <div id="starsContainer" class="fixed inset-0 pointer-events-none z-0"></div>
+
+  <!-- Background Music -->
+  <audio id="bgMusic" src="HappyBirthday.mp3" preload="auto" loop></audio>
+
+  <!-- ======================================================================= -->
+  <!-- 🔒 PANTALLA DE BLOQUEO CINEMATOGRÁFICA (HASTA LAS 00:00)                -->
+  <!-- ======================================================================= -->
+  <section id="lockScreen" class="hidden relative z-20 luxury-glass rounded-3xl p-8 sm:p-11 max-w-md w-full text-center my-6">
+    <!-- Ornamental Corners -->
+    <div class="corner-ornament top-4 left-4 border-t-2 border-l-2 rounded-tl-lg"></div>
+    <div class="corner-ornament top-4 right-4 border-t-2 border-r-2 rounded-tr-lg"></div>
+    <div class="corner-ornament bottom-4 left-4 border-b-2 border-l-2 rounded-bl-lg"></div>
+    <div class="corner-ornament bottom-4 right-4 border-b-2 border-r-2 rounded-br-lg"></div>
+
+    <!-- Animated Vault Ring -->
+    <div class="relative w-24 h-24 mx-auto mb-5 flex items-center justify-center">
+      <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(255,215,0,0.15)" stroke-width="3"/>
+        <circle id="progressRing" cx="50" cy="50" r="44" fill="none" stroke="url(#ringGrad)" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="276.46" stroke-dashoffset="0"/>
+        <defs>
+          <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#fff2a3"/>
+            <stop offset="50%" stop-color="#ffd700"/>
+            <stop offset="100%" stop-color="#b8860b"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div class="absolute inset-0 flex items-center justify-center">
+        <span class="text-3xl drop-shadow-[0_0_12px_rgba(255,215,0,0.6)]">🥂</span>
+      </div>
+    </div>
+
+    <span class="text-[11px] uppercase tracking-[0.35em] text-amber-300/75 font-semibold block">
+      Reservado Para Medianoche
+    </span>
+    <h2 class="text-3xl sm:text-4xl font-royal font-bold gold-foil mt-2 mb-3">
+      La Cuenta Regresiva
+    </h2>
+    <p class="text-amber-100/75 text-xs sm:text-sm leading-relaxed mb-7 px-2">
+      Preparé algo único para ti. Este portal se abrirá automáticamente en el primer segundo de tu cumpleaños a las <span class="text-amber-300 font-semibold">00:00</span>.
+    </p>
+
+    <!-- Digital Luxury Countdown -->
+    <div class="grid grid-cols-4 gap-2.5 mb-7">
+      <div class="bg-black/60 border border-amber-400/25 rounded-2xl py-3.5 px-2 shadow-inner">
+        <span id="cdDays" class="block text-2xl sm:text-3xl font-bold gold-foil font-royal">00</span>
+        <span class="text-[9px] uppercase tracking-[0.2em] text-amber-200/50 mt-1 block">Días</span>
+      </div>
+      <div class="bg-black/60 border border-amber-400/25 rounded-2xl py-3.5 px-2 shadow-inner">
+        <span id="cdHours" class="block text-2xl sm:text-3xl font-bold gold-foil font-royal">00</span>
+        <span class="text-[9px] uppercase tracking-[0.2em] text-amber-200/50 mt-1 block">Horas</span>
+      </div>
+      <div class="bg-black/60 border border-amber-400/25 rounded-2xl py-3.5 px-2 shadow-inner">
+        <span id="cdMinutes" class="block text-2xl sm:text-3xl font-bold gold-foil font-royal">00</span>
+        <span class="text-[9px] uppercase tracking-[0.2em] text-amber-200/50 mt-1 block">Min</span>
+      </div>
+      <div class="bg-black/60 border border-amber-400/25 rounded-2xl py-3.5 px-2 shadow-inner">
+        <span id="cdSeconds" class="block text-2xl sm:text-3xl font-bold gold-foil font-royal">00</span>
+        <span class="text-[9px] uppercase tracking-[0.2em] text-amber-200/50 mt-1 block">Seg</span>
+      </div>
+    </div>
+
+    <div class="border-t border-amber-400/15 pt-4">
+      <p class="text-xs text-amber-200/60 italic">
+        "Lo mejor del día empieza justo cuando el reloj marca las doce..." ✨
+      </p>
+    </div>
+  </section>
+
+  <!-- ======================================================================= -->
+  <!-- ✨ EXPERIENCIA PRINCIPAL DE CUMPLEAÑOS                                  -->
+  <!-- ======================================================================= -->
+  <main id="mainContent" class="hidden relative z-10 luxury-glass rounded-3xl p-6 sm:p-10 max-w-lg w-full text-center overflow-hidden my-6">
+    <!-- Ornamental Corners -->
+    <div class="corner-ornament top-4 left-4 border-t-2 border-l-2 rounded-tl-lg"></div>
+    <div class="corner-ornament top-4 right-4 border-t-2 border-r-2 rounded-tr-lg"></div>
+    <div class="corner-ornament bottom-4 left-4 border-b-2 border-l-2 rounded-bl-lg"></div>
+    <div class="corner-ornament bottom-4 right-4 border-b-2 border-r-2 rounded-br-lg"></div>
+
+    <!-- Header -->
+    <header class="mb-2">
+      <span class="text-[10px] sm:text-xs uppercase tracking-[0.35em] text-amber-300/75 font-semibold block">
+        Edición Especial • 00:00
+      </span>
+      <p class="font-script text-3xl sm:text-4xl text-amber-200/90 mt-1 -mb-1">
+        Para alguien inolvidable
+      </p>
+      <h1 id="appHeader" class="text-2xl sm:text-4xl font-black font-royal gold-foil tracking-wide">
+        ¡Feliz Cumpleaños!
+      </h1>
+    </header>
+
+    <!-- VECTOR CAKE WITH AMBIENT HALO -->
+    <div id="cakeWrapper" class="relative my-4 flex justify-center items-center transition-all duration-700">
+      <div id="cakeHalo" class="cake-halo"></div>
+      <div class="relative w-64 h-56 flex items-center justify-center">
+        
+        <svg viewBox="0 0 300 260" class="w-full h-full drop-shadow-[0_15px_30px_rgba(0,0,0,0.85)]">
+          <!-- Plate -->
+          <ellipse cx="150" cy="235" rx="132" ry="15" fill="url(#plateGrad)" stroke="#aa771c" stroke-width="2"/>
+          <ellipse cx="150" cy="232" rx="115" ry="10" fill="#121019" opacity="0.65"/>
+
+          <!-- Cake Bottom Tier -->
+          <path d="M 50,170 Q 150,195 250,170 L 250,225 Q 150,250 50,225 Z" fill="url(#cakeBottomGrad)" stroke="#4a3710" stroke-width="1.5"/>
+          <ellipse cx="150" cy="170" rx="100" ry="18" fill="url(#cakeTopSurfaceGrad)"/>
+          
+          <!-- Bottom Tier Gold Drip -->
+          <path d="M 50,170 Q 75,185 100,170 Q 125,185 150,170 Q 175,185 200,170 Q 225,185 250,170 L 250,180 Q 225,195 200,180 Q 175,195 150,180 Q 125,195 100,180 Q 75,195 50,180 Z" fill="#ffd700" opacity="0.88"/>
+
+          <!-- Cake Top Tier -->
+          <path d="M 80,110 Q 150,130 220,110 L 220,165 Q 150,185 80,165 Z" fill="url(#cakeTopGrad)" stroke="#4a3710" stroke-width="1.5"/>
+          <ellipse cx="150" cy="110" rx="70" ry="14" fill="#3a2a10"/>
+
+          <!-- Top Tier Cream Drip -->
+          <path d="M 80,110 Q 100,125 120,110 Q 140,125 160,110 Q 180,125 220,110 L 220,120 Q 200,132 180,118 Q 160,132 140,118 Q 120,132 100,118 Q 80,128 80,118 Z" fill="#fff2a3"/>
+
+          <!-- Gold Pearls -->
+          <circle cx="100" cy="165" r="3.5" fill="#fff2a3" />
+          <circle cx="130" cy="172" r="3.5" fill="#fff2a3" />
+          <circle cx="170" cy="172" r="3.5" fill="#fff2a3" />
+          <circle cx="200" cy="165" r="3.5" fill="#fff2a3" />
+
+          <!-- CANDLE 1 -->
+          <g transform="translate(100, 60)">
+            <rect x="-4" y="15" width="8" height="38" rx="2" fill="url(#candleGrad)"/>
+            <line x1="0" y1="15" x2="0" y2="8" stroke="#333" stroke-width="1.5"/>
+            <g id="flame1" class="flame">
+              <path d="M 0,9 C -6,2 -5,-8 0,-14 C 5,-8 6,2 0,9 Z" fill="url(#flameGrad)"/>
+              <ellipse cx="0" cy="-2" rx="2" ry="4" fill="#ffffff"/>
+            </g>
+          </g>
+
+          <!-- CANDLE 2 (Center) -->
+          <g transform="translate(150, 50)">
+            <rect x="-5" y="15" width="10" height="46" rx="2" fill="url(#candleGradGold)"/>
+            <line x1="0" y1="15" x2="0" y2="7" stroke="#333" stroke-width="1.5"/>
+            <g id="flame2" class="flame">
+              <path d="M 0,8 C -7,1 -6,-10 0,-16 C 6,-10 7,1 0,8 Z" fill="url(#flameGrad)"/>
+              <ellipse cx="0" cy="-3" rx="2.5" ry="5" fill="#ffffff"/>
+            </g>
+          </g>
+
+          <!-- CANDLE 3 -->
+          <g transform="translate(200, 60)">
+            <rect x="-4" y="15" width="8" height="38" rx="2" fill="url(#candleGrad)"/>
+            <line x1="0" y1="15" x2="0" y2="8" stroke="#333" stroke-width="1.5"/>
+            <g id="flame3" class="flame">
+              <path d="M 0,9 C -6,2 -5,-8 0,-14 C 5,-8 6,2 0,9 Z" fill="url(#flameGrad)"/>
+              <ellipse cx="0" cy="-2" rx="2" ry="4" fill="#ffffff"/>
+            </g>
+          </g>
+
+          <defs>
+            <linearGradient id="plateGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#bf953f" />
+              <stop offset="50%" stop-color="#fcf6ba" />
+              <stop offset="100%" stop-color="#aa771c" />
+            </linearGradient>
+            <linearGradient id="cakeBottomGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#2a1f10" />
+              <stop offset="100%" stop-color="#150e06" />
+            </linearGradient>
+            <linearGradient id="cakeTopSurfaceGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#4a3518" />
+              <stop offset="100%" stop-color="#2a1f10" />
+            </linearGradient>
+            <linearGradient id="cakeTopGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#3d2b15" />
+              <stop offset="100%" stop-color="#1f1408" />
+            </linearGradient>
+            <linearGradient id="candleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#ffffff" />
+              <stop offset="50%" stop-color="#e0e0e0" />
+              <stop offset="100%" stop-color="#b0b0b0" />
+            </linearGradient>
+            <linearGradient id="candleGradGold" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#ffe57f" />
+              <stop offset="50%" stop-color="#ffd700" />
+              <stop offset="100%" stop-color="#c59b27" />
+            </linearGradient>
+            <radialGradient id="flameGrad" cx="50%" cy="70%" r="50%">
+              <stop offset="0%" stop-color="#ffffff" />
+              <stop offset="25%" stop-color="#ffea75" />
+              <stop offset="60%" stop-color="#ff6d00" />
+              <stop offset="100%" stop-color="#d50000" />
+            </radialGradient>
+          </defs>
+        </svg>
+
+        <!-- Smoke Anchors -->
+        <div id="smokeAnchor1" class="absolute left-[33%] top-[18%]"></div>
+        <div id="smokeAnchor2" class="absolute left-[50%] top-[14%]"></div>
+        <div id="smokeAnchor3" class="absolute left-[67%] top-[18%]"></div>
+      </div>
+    </div>
+
+    <!-- INTERACTIVE STEPS -->
+    <div class="relative min-h-[175px] flex items-center justify-center">
+
+      <!-- STEP 1 -->
+      <div id="step1" class="step-card step-active">
+        <p class="text-amber-100/80 mb-6 text-sm leading-relaxed max-w-sm mx-auto">
+          El reloj ha dado las 00:00. Enciende las velas para comenzar tu celebración.
+        </p>
+        <button onclick="iniciarSorpresa()" class="btn-luxury text-black font-extrabold py-3.5 px-9 rounded-full hover:scale-105 active:scale-95 transition-all duration-300 text-sm tracking-[0.15em] uppercase flex items-center justify-center gap-2.5 mx-auto">
+          <span>Encender las Velas</span> ✨
+        </button>
+      </div>
+
+      <!-- STEP 2 -->
+      <div id="step2" class="step-card step-hidden">
+        <p id="lightingStatus" class="text-lg sm:text-xl font-semibold gold-foil animate-pulse">
+          Preparando la magia... 🕯️
+        </p>
+      </div>
+
+      <!-- STEP 3 -->
+      <div id="step3" class="step-card step-hidden">
+        <h2 class="text-xl sm:text-2xl font-bold font-royal gold-foil mb-2">
+          Cierra los ojos y pide un deseo 🌟
+        </h2>
+        <p class="text-amber-100/85 text-xs sm:text-sm max-w-xs mx-auto">
+          Cuando estés lista, sopla las velas para que se haga realidad...
+        </p>
+        <button onclick="soplarVelas()" class="mt-5 bg-amber-400/15 hover:bg-amber-400/30 text-amber-200 border border-amber-300/60 py-3 px-8 rounded-full text-xs uppercase tracking-[0.2em] font-bold transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,215,0,0.2)]">
+          💨 Soplar Velas
+        </button>
+      </div>
+
+      <!-- STEP 4 -->
+      <div id="step4" class="step-card step-hidden">
+        <div id="phrasesBox" class="min-h-[120px] flex flex-col items-center justify-center px-3">
+          <p id="phraseText" class="text-base sm:text-lg font-medium text-amber-100/95 leading-relaxed italic transition-opacity duration-500">
+          </p>
+        </div>
+      </div>
+
+      <!-- STEP 5: POLAROID + SNOOPY + SECRET LETTER -->
+      <div id="step5" class="step-card step-hidden">
+        <div class="flex flex-col items-center justify-center">
+          
+          <div class="relative flex items-center justify-center gap-4 mb-5">
+            <!-- Polaroid Frame -->
+            <div class="polaroid-card">
+              <img id="cumpleFoto" src="foto.jpg.jpeg" alt="Cumpleañera" class="w-36 h-36 sm:w-44 sm:h-44 object-cover rounded-lg" />
+              <span class="font-script text-xl text-amber-300 block mt-1.5">Tu día especial ✨</span>
+            </div>
+
+            <!-- Snoopy con Flor -->
+            <div class="w-24 sm:w-28 snoopy-float flex-shrink-0">
+              <img src="snoopy.png" alt="Snoopy con Flor" class="w-full h-auto drop-shadow-[0_0_18px_rgba(255,215,0,0.45)]" />
+            </div>
+          </div>
+
+          <h2 class="text-2xl sm:text-3xl font-black font-royal gold-foil uppercase tracking-wider">
+            ¡Que Viva la Cumpleañera! 👑
+          </h2>
+          <p class="text-amber-200/80 text-xs sm:text-sm mt-2 max-w-sm">
+            Que este nuevo año de vida te regale momentos tan increíbles como tú.
+          </p>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-wrap items-center justify-center gap-3 mt-6">
+            <button onclick="abrirCarta()" class="btn-luxury text-black font-bold py-2.5 px-6 rounded-full text-xs uppercase tracking-widest hover:scale-105 transition-transform">
+              💌 Leer Nota Especial
+            </button>
+            <button onclick="reiniciarExperiencia()" class="bg-white/5 hover:bg-white/10 text-amber-200/80 border border-amber-300/30 py-2.5 px-5 rounded-full text-xs uppercase tracking-widest transition-colors">
+              🔄 Repetir
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ======================================================================= -->
+  <!-- 💌 MODAL DE CARTA DEDICADA                                              -->
+  <!-- ======================================================================= -->
+  <div id="letterModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="letter-paper rounded-3xl p-7 sm:p-9 max-w-md w-full text-center relative animate-[fadeIn_0.4s_ease]">
+      <button onclick="cerrarCarta()" class="absolute top-4 right-5 text-amber-300/60 hover:text-amber-300 text-xl font-bold">✕</button>
+      
+      <span class="text-[10px] uppercase tracking-[0.3em] text-amber-300/70">Para Ti</span>
+      <h3 class="font-script text-4xl gold-foil mt-1 mb-4">Feliz Cumpleaños</h3>
+      
+      <div class="text-amber-100/90 text-sm leading-relaxed space-y-3 text-left font-light border-y border-amber-400/20 py-5 my-2">
+        <p>
+          Quise que este fuera el primer detalle que vieras al comenzar su día, porque mereces celebrar desde el primer segundo.
+        </p>
+        <p>
+          Deseo que en esta nueva vuelta al sol nunca te falten motivos para sonreír, metas cumplidas y personas que valoren la luz tan bonita que tienes.
+        </p>
+        <p class="text-amber-300 font-medium text-right pt-2 font-script text-2xl">
+          Con mucho cariño ✨
+        </p>
+      </div>
+
+      <button onclick="cerrarCarta()" class="mt-5 text-xs uppercase tracking-widest text-amber-300/80 hover:text-amber-200 underline">
+        Volver a la sorpresa
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // ⚙️ CONFIGURACIÓN PRINCIPAL (EDITA AQUÍ LA FECHA EXACTA)
+    // =========================================================================
+    // Formato: "AAAA-MM-DDTHH:MM:SS" -> Se abre a las 00:00 y queda abierto DE POR VIDA
+    const FECHA_DESBLOQUEO = "2026-11-26T00:00:00";
+    const LLAVE_MEMORIA = "cumple_desbloqueado_" + FECHA_DESBLOQUEO;
+
+    const URL_DE_TU_FOTO = "foto.jpg.jpeg";
+    document.getElementById('cumpleFoto').src = URL_DE_TU_FOTO;
+
+    // =========================================================================
+    // 🔒 CONTROL DE APERTURA EXACTA A LAS 00:00 (SIN RE-BLOQUEO)
+    // =========================================================================
+    const targetTime = new Date(FECHA_DESBLOQUEO).getTime();
+    const startReference = targetTime - (24 * 60 * 60 * 1000); // Referencia 24h antes para el anillo
+    const lockScreen = document.getElementById('lockScreen');
+    const mainContent = document.getElementById('mainContent');
+    const progressRing = document.getElementById('progressRing');
+    const circumference = 2 * Math.PI * 44; // 276.46
+    let timer = null;
+
+    function desbloquearParaSiempre() {
+      localStorage.setItem(LLAVE_MEMORIA, "true");
+      if (timer) {
+        clearInterval(timer);
+        dispararConfetiDorado();
+      }
+      lockScreen.classList.add('hidden');
+      mainContent.classList.remove('hidden');
+    }
+
+    function verificarHorario() {
+      const now = Date.now();
+
+      // Si ya se desbloqueó antes o si ya pasó la hora exacta (00:00)
+      if (localStorage.getItem(LLAVE_MEMORIA) === "true" || now >= targetTime) {
+        desbloquearParaSiempre();
+        return true;
+      }
+
+      // Mostrar pantalla de espera y actualizar reloj
+      lockScreen.classList.remove('hidden');
+      mainContent.classList.add('hidden');
+
+      const diff = targetTime - now;
+      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+      document.getElementById('cdDays').innerText = String(d).padStart(2, '0');
+      document.getElementById('cdHours').innerText = String(h).padStart(2, '0');
+      document.getElementById('cdMinutes').innerText = String(m).padStart(2, '0');
+      document.getElementById('cdSeconds').innerText = String(s).padStart(2, '0');
+
+      // Actualizar anillo de progreso
+      const totalSpan = targetTime - startReference;
+      const progress = Math.max(0, Math.min(1, 1 - (diff / totalSpan)));
+      progressRing.style.strokeDashoffset = circumference * (1 - progress);
+
+      return false;
+    }
+
+    if (!verificarHorario()) {
+      timer = setInterval(verificarHorario, 1000);
+    }
+
+    // =========================================================================
+    // ✨ PARTÍCULAS Y EXPERIENCIA INTERACTIVA
+    // =========================================================================
+    (function createStars() {
+      const container = document.getElementById('starsContainer');
+      for (let i = 0; i < 45; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        const size = Math.random() * 3.5 + 1;
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.top = `${Math.random() * 100}%`;
+        star.style.animationDuration = `${2.5 + Math.random() * 3.5}s`;
+        star.style.animationDelay = `${Math.random() * 2}s`;
+        container.appendChild(star);
+      }
+    })();
+
+    const bgMusic = document.getElementById('bgMusic');
+
+    function setStep(fromId, toId) {
+      const fromEl = document.getElementById(fromId);
+      const toEl = document.getElementById(toId);
+      fromEl.classList.remove('step-active');
+      fromEl.classList.add('step-hidden');
+
+      setTimeout(() => {
+        toEl.classList.remove('step-hidden');
+        toEl.classList.add('step-active');
+      }, 420);
+    }
+
+    async function iniciarSorpresa() {
+      bgMusic.play().catch(() => {});
+      setStep('step1', 'step2');
+
+      const statusEl = document.getElementById('lightingStatus');
+      const halo = document.getElementById('cakeHalo');
+
+      await new Promise(r => setTimeout(r, 550));
+      document.getElementById('flame1').classList.add('lit');
+      statusEl.innerText = "Encendiendo la primera vela... 🕯️";
+
+      await new Promise(r => setTimeout(r, 750));
+      document.getElementById('flame2').classList.add('lit');
+      halo.classList.add('active');
+      statusEl.innerText = "Encendiendo la segunda vela... ✨";
+
+      await new Promise(r => setTimeout(r, 750));
+      document.getElementById('flame3').classList.add('lit');
+      statusEl.innerText = "¡Brillan todas tus velas! 🔥";
+
+      dispararSparkles();
+
+      await new Promise(r => setTimeout(r, 1000));
+      setStep('step2', 'step3');
+    }
+
+    function soplarVelas() {
+      const flames = ['flame1', 'flame2', 'flame3'];
+      const anchors = ['smokeAnchor1', 'smokeAnchor2', 'smokeAnchor3'];
+      document.getElementById('cakeHalo').classList.remove('active');
+
+      flames.forEach((flameId, index) => {
+        setTimeout(() => {
+          document.getElementById(flameId).classList.remove('lit');
+          generarHumo(anchors[index]);
+        }, index * 200);
+      });
+
+      setTimeout(() => {
+        document.getElementById('cakeWrapper').style.transform = 'scale(0.84)';
+        setStep('step3', 'step4');
+        dispararConfetiDorado();
+        mostrarFrases();
+      }, 1200);
+    }
+
+    function generarHumo(anchorId) {
+      const anchor = document.getElementById(anchorId);
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+          const p = document.createElement('div');
+          p.className = 'smoke-particle active';
+          p.style.left = `${(Math.random() - 0.5) * 12}px`;
+          anchor.appendChild(p);
+          setTimeout(() => p.remove(), 2400);
+        }, i * 140);
+      }
+    }
+
+    async function mostrarFrases() {
+      const frases = [
+        "✨ Que cada deseo que pediste hoy encuentre el camino perfecto para cumplirse.",
+        "🌹 Hoy celebra su vida, su esencia y lo especial que haces cada momento.",
+        "🥂 Por un año lleno de salud, éxitos, risas y sueños hechos realidad.",
+        "💖 Gracias por ser exactamente como eres y por iluminar todo a tu alrededor.",
+        "👑 ¡Feliz cumpleaños Stefi! Que este día sea tan inolvidable y hermoso como tú."
+      ];
+
+      const phraseText = document.getElementById('phraseText');
+
+      for (let i = 0; i < frases.length; i++) {
+        phraseText.style.opacity = '0';
+        await new Promise(r => setTimeout(r, 400));
+        phraseText.innerText = frases[i];
+        phraseText.style.opacity = '1';
+        await new Promise(r => setTimeout(r, 3300));
+      }
+
+      setStep('step4', 'step5');
+      dispararConfetiDorado();
+    }
+
+    function dispararConfetiDorado() {
+      confetti({
+        particleCount: 130,
+        spread: 85,
+        origin: { y: 0.6 },
+        colors: ['#ffd700', '#fff3b0', '#ffa500', '#ffffff', '#bf953f']
+      });
+    }
+
+    function dispararSparkles() {
+      confetti({ particleCount: 45, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ffd700', '#ffffff'] });
+      confetti({ particleCount: 45, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ffd700', '#ffffff'] });
+    }
+
+    function reiniciarExperiencia() {
+      document.getElementById('cakeWrapper').style.transform = 'scale(1)';
+      setStep('step5', 'step1');
+    }
+
+    function abrirCarta() {
+      document.getElementById('letterModal').classList.remove('hidden');
+      dispararSparkles();
+    }
+
+    function cerrarCarta() {
+      document.getElementById('letterModal').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
